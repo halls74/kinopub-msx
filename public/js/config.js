@@ -23,7 +23,7 @@
 
         // Base URL used for every API call. Must end WITHOUT a trailing slash.
         // Replace with your deployed proxy, e.g. "https://kp-proxy.<you>.workers.dev".
-        API_BASE: "https://kp-proxy.example.workers.dev",
+        API_BASE: "https://api.service-kp.com",
 
         // Known official API hosts / mirrors (the proxy forwards to one of these).
         API_MIRRORS: [
