@@ -88,30 +88,48 @@ git commit -am "start.json: подставлен хост" && git push
 
 ## B. Развёртывание прокси (CORS + клавиатура + субтитры)
 
-Файл `worker/worker.js` — это Cloudflare Worker. Прокси нужен всегда: он
-добавляет CORS к ответам API, обслуживает `/msx/keyboard` (поиск) и `/sub`
-(субтитры).
+Файл `worker/worker.js` — это Cloudflare Worker. Прокси нужен, если API
+KinoPUB не отдаёт CORS-заголовки: он добавляет CORS к ответам, обслуживает
+`/msx/keyboard` (поиск) и `/sub` (субтитры).
 
-### B.1. Разверните Worker
-Через Wrangler:
+### B.0. Сначала попробуйте БЕЗ прокси (30 секунд)
+Возможно, прокси вам не нужен. В `public/js/config.js` временно укажите:
+```js
+API_BASE: "https://api.service-kp.com",
+```
+запушьте и запустите оболочку. Если после входа открылась главная — прокси не
+нужен, пропустите весь раздел B. Если видите ошибку загрузки — вернитесь к
+прокси ниже.
+
+### B.1. Разверните Worker БЕЗ командной строки (через сайт)
+Не нужен ни `wrangler`, ни терминал — только копирование текста:
+1. Зарегистрируйтесь на **https://dash.cloudflare.com** (бесплатно).
+2. Слева: **Workers & Pages → Create → Workers → Create Worker**.
+3. Придумайте имя (например `kinopub`) → **Deploy**.
+4. Откройте воркер → **Edit code**. Выделите весь код (Ctrl+A), удалите и
+   вставьте содержимое файла `worker/worker.js`. Нажмите **Deploy**.
+5. Скопируйте адрес воркера сверху, вида `https://kinopub.<вы>.workers.dev`.
+
+Вставьте этот адрес в `public/js/config.js` → `API_BASE` (без слэша в конце),
+закоммитьте и запушьте.
+
+### B.1-alt. Через командную строку (для тех, кому так привычнее)
 ```bash
 cd worker
-npx wrangler init --from-dash    # либо создайте новый проект воркера
-# замените сгенерированный src содержимым worker.js, затем:
 npx wrangler deploy
 ```
-Либо вставьте `worker.js` в **Cloudflare Dashboard → Workers → Create → Edit code**.
 
-Запомните URL воркера, например `https://kp-proxy.<вы>.workers.dev`.
+### B.2. Куда положить ключи client_id / client_secret
+Два варианта:
 
-### B.2. Положите ключи в секреты (рекомендуется)
-Так `client_id`/`client_secret` не попадут в публичный репозиторий:
-```bash
-npx wrangler secret put KP_CLIENT_ID
-npx wrangler secret put KP_CLIENT_SECRET
-```
-Воркер сам подставит их во все запросы `/oauth2/*`. В этом случае в `config.js`
-оставьте `CLIENT_ID`/`CLIENT_SECRET` пустыми.
+- **Проще всего:** впишите их прямо в `public/js/config.js` (`CLIENT_ID`,
+  `CLIENT_SECRET`). Минус — файл публичный, ключи увидит любой. Для личного
+  использования это чаще всего приемлемо.
+- **Безопаснее (через сайт Cloudflare):** откройте ваш воркер →
+  **Settings → Variables and Secrets → Add**, добавьте `KP_CLIENT_ID` и
+  `KP_CLIENT_SECRET` (как Secret), нажмите Deploy. Воркер сам подставит их в
+  запросы `/oauth2/*`, а в `config.js` оставьте эти поля пустыми.
+  (Через CLI то же самое: `npx wrangler secret put KP_CLIENT_ID`.)
 
 > **Другой прокси?** Подойдёт любой (Deno Deploy, небольшой Node/Express,
 > nginx с `proxy_pass` и `add_header Access-Control-Allow-Origin *`). Он должен
@@ -137,23 +155,45 @@ git commit -am "config: указан API_BASE" && git push
 
 ---
 
-## D. Параметр запуска MSX
-На ТВ: **Media Station X → Settings → Start Parameter**, введите **один** из
-вариантов:
+## D. Параметр запуска MSX — БЕЗ ввода слэшей
 
-- Статичное меню (проще всего):
-  ```
-  menu:https://<ВАШ_ЛОГИН>.github.io/kinopub-msx/public/start.json
-  ```
-- Динамическое меню, знающее о входе (разделы строятся из API):
-  ```
-  menu:request:interaction:menu@https://<ВАШ_ЛОГИН>.github.io/kinopub-msx/public/app.html
-  ```
+Клавиатура MSX не даёт вводить «/», поэтому длинный URL вбивать и не нужно.
+MSX умеет короткие ссылки в формате `id:сервис:алиас` (только буквы, цифры и
+двоеточия). Делаем один раз короткую ссылку и вводим на ТВ пару слов.
 
-Сохраните и перезапустите MSX (или используйте «Reload»).
+**Шаг 1. Соберите ссылку запуска** (нигде на ТВ её вводить не надо — только
+вставите в сократитель):
+```
+https://msx.benzac.de/?start=menu:request:interaction:menu@https://<ВАШ_ЛОГИН>.github.io/kinopub-msx/public/app.html
+```
+Можно открыть её в браузере ПК прямо сейчас — так вы проверите оболочку без ТВ.
 
-> Совет: можно мгновенно проверить в браузере ПК через демо-страницу MSX:
-> `https://msx.benzac.de/?start=menu:https://<ВАШ_ЛОГИН>.github.io/kinopub-msx/public/start.json`
+**Шаг 2. Сократите ссылку с понятным алиасом.** Откройте **https://is.gd**,
+вставьте ссылку из шага 1, задайте свой короткий алиас (только строчные буквы и
+цифры), например `kinopubmsx`, и создайте. Получится вроде `https://is.gd/kinopubmsx`.
+
+**Шаг 3. На ТВ:** **Media Station X → Settings → Start Parameter → Setup** и
+введите короткую строку (слэши не нужны):
+```
+id:igd:kinopubmsx
+```
+`igd` — это код сервиса is.gd; `kinopubmsx` — ваш алиас. Сохраните и перезапустите
+MSX. Если алиас содержит заглавные буквы, перед каждой ставьте дефис
+(`Alias` → `-alias`... точнее `A-lias` → `-a-lias`) — но проще сразу делать алиас
+строчными.
+
+> Другие сервисы тоже поддерживаются: TinyURL — `id:trl:алиас`, v.gd —
+> `id:vgd:алиас`, Bitly — `id:bly:алиас` (у Bitly алиас выдаётся автоматически).
+
+**Альтернатива без сократителя** (если ваш хостинг отдаёт файлы из корня домена,
+например персональный сайт `ВАШ_ЛОГИН.github.io`): положите `start.json` по пути
+`/msx/start.json` в корень, тогда в **Setup** можно ввести только имя хоста
+(`ВАШ_ЛОГИН.github.io`) и включить «security lock» (HTTPS) — MSX сам допишет
+`/msx/start.json`. Слэши при этом тоже не вводятся.
+
+> Файл `public/start.json` уже оформлен как правильный **Start Object** и
+> указывает на динамическое меню оболочки — менять его содержимое не нужно,
+> только подставить свой хост вместо `YOURHOST` (шаг A.4).
 
 ---
 
