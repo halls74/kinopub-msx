@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KinoPUB — MSX Interaction Plugin</title>
+    <style type="text/css">
+        /* The interaction plugin lives in a transparent background iframe and
+           has no visible UI of its own — all UI is rendered by MSX from the
+           JSON this plugin returns. Keep the body transparent/empty. */
+        html, body { margin: 0; padding: 0; background: transparent; color: #fff;
+            font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+        .boot { position: fixed; left: 16px; bottom: 12px; opacity: .25; font-size: 12px; }
+    </style>
+
+    <!-- 1) MSX plugin framework (protocol-relative, per MSX docs) -->
+    <script type="text/javascript" src="//msx.benzac.de/js/tvx-plugin.min.js"></script>
+
+    <!-- 2) Shell modules — ORDER MATTERS -->
+    <script type="text/javascript" src="js/config.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
+    <script type="text/javascript" src="js/store.js"></script>
+    <script type="text/javascript" src="js/api.js"></script>
+    <script type="text/javascript" src="js/ui.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+</head>
+<body>
+    <div class="boot">KinoPUB shell for Media Station X</div>
+</body>
+</html>

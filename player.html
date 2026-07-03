@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KinoPUB — MSX Video Plugin</title>
+    <style type="text/css">
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+        #video { position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                 background: #000; object-fit: contain; }
+        /* Native subtitle rendering styling (where supported) */
+        video::cue { background: rgba(0,0,0,0.6); color: #fff; font-size: 1.1em; }
+    </style>
+
+    <!-- Optional: enable hls.js for non-webOS test browsers that lack native HLS.
+         On LG webOS the built-in <video> plays HLS, so this is not required there. -->
+    <!-- <script src="//cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script> -->
+
+    <script type="text/javascript" src="//msx.benzac.de/js/tvx-plugin.min.js"></script>
+    <script type="text/javascript" src="js/config.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
+    <script type="text/javascript" src="js/store.js"></script>
+    <script type="text/javascript" src="js/api.js"></script>
+    <script type="text/javascript" src="js/player.js"></script>
+</head>
+<body>
+    <video id="video" preload="metadata" playsinline webkit-playsinline crossorigin="anonymous"></video>
+</body>
+</html>
