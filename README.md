@@ -163,13 +163,11 @@ video:plugin:https://HOST/public/player.html?mid=98765&id=12345&video=1&pos=738&
    оставьте пустыми (см. INSTALL).
 4. В `start.json` замените все `https://YOURHOST/kinopub-msx/public/app.html` на
    реальный URL вашего `app.html`.
-5. На ТВ откройте **Media Station X → Settings → Start Parameter** и укажите ваше
-   меню — одним из способов:
-   - `menu:https://HOST/public/start.json`  *(статичное меню)*, **или**
-   - `menu:request:interaction:menu@https://HOST/public/app.html`  *(динамическое
-     меню, знающее о входе, которое строит плагин)*.
-6. Перезапустите MSX. При первом запуске появится экран активации — введите код
-   на `kino.pub/device`; приложение войдёт автоматически и откроет главную.
+5. На ТВ откройте **Media Station X → Settings → Start Parameter → Setup**.
+   Слэши вводить не нужно: сделайте короткую ссылку на is.gd (см. `docs/INSTALL.md`,
+   раздел D) и введите её в виде `id:igd:вашалиас` — только буквы и цифры.
+6. При первом запуске появится экран активации — введите код на `kino.pub/device`;
+   приложение войдёт автоматически и откроет главную.
 
 **Рекомендуемая настройка MSX:** включите *Rounded Style* — для скруглённых
 постеров в стиле tvOS, которые используются повсюду.
